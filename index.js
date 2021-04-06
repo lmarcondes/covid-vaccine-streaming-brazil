@@ -7,6 +7,7 @@ const fs = require('fs')
 const apiUrl = process.env.API_URL
 const apiUser = process.env.API_USER
 const apiPassword = process.env.API_PASSWORD
+const pgTable = process.env.PGTABLE
 const { tableSchema, colOrder, colNames } = JSON.parse(fs.readFileSync('./config/schema.json', 'utf8'))
 
 const getRecords = (size, scroll, scrollId) => {
@@ -53,7 +54,7 @@ const getRecords = (size, scroll, scrollId) => {
 }
 
 const saveRecords = (records) => {
-  const table = 'gov.vacinacao_covid'
+  const table = pgTable
   const insertQuery = `insert into ${table}(%I) values %L on conflict do nothing`
   // const selectQuery = `select document_id from ${table} where document_id in (%L)`
   return new Promise((resolve, reject) => {
@@ -84,20 +85,17 @@ const sleep = (milliseconds) => {
     try {
       console.log('query prarms', { size, scroll, scrollId })
       const res = await getRecords(size, scroll, scrollId)
+      scrollId = res.data._scroll_id
       const hits = res.data.hits.hits
       const hitsArray = hits.map((value) => {
         return value._source
       })
       if (hitsArray.length > 0) {
-        const queryResponse = await saveRecords(hitsArray)
-        const rowCount = queryResponse.rowCount
-        if (rowCount > 0) {
-          scrollPosition += 1
-          scroll = `${scrollPosition}m`
-        } else {
-          throw new Error('no records updated')
-        }
+        await saveRecords(hitsArray)
+        scrollPosition += 1
+        scroll = `${scrollPosition}m`
         scrollId = res.data._scroll_id
+        await sleep(1000 * 5)
       } else {
         throw new Error('no records received')
       }
@@ -106,7 +104,6 @@ const sleep = (milliseconds) => {
       await sleep(1000 * 20)
       scrollPosition = 0
       scroll = `${scrollPosition}m`
-      scrollId = null
     }
   }
 })()
