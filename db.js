@@ -16,9 +16,11 @@ const query = (text, params) => {
   return new Promise((resolve, reject) => {
     const start = Date.now()
     pool.query(text, params, (err, res) => {
+      if (err || res === undefined) {
+        reject(err)
+      }
       const duration = Date.now() - start
       console.log('ran query', { text, duration, rowCount: res.rowCount })
-      if (err) reject(err)
       resolve(res)
     })
   })
