@@ -95,7 +95,7 @@ const sleep = (milliseconds) => {
         scrollPosition += 1
         scroll = `${scrollPosition}m`
         scrollId = res.data._scroll_id
-        await sleep(1000 * 2)
+        // await sleep(1000 * 2)
       } else {
         throw new Error('no records received')
       }
