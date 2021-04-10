@@ -80,7 +80,7 @@ const sleep = (milliseconds) => {
   let scrollId
   let scrollPosition = 0
   let scroll
-  const size = 500
+  const size = 10000
   while (true) {
     try {
       console.log('query prarms', { size, scroll, scrollId })
