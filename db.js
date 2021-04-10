@@ -20,7 +20,7 @@ const query = (text, params) => {
         reject(err)
       }
       const duration = Date.now() - start
-      console.log('ran query', { text, duration, rowCount: res.rowCount })
+      console.log('ran query', { duration, rowCount: res.rowCount })
       resolve(res)
     })
   })
