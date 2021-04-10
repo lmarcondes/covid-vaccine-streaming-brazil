@@ -104,6 +104,7 @@ const sleep = (milliseconds) => {
       await sleep(1000 * 20)
       scrollPosition = 0
       scroll = `${scrollPosition}m`
+      scrollId = null
     }
   }
 })()
